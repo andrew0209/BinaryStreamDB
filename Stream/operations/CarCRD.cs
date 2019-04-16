@@ -83,7 +83,32 @@ namespace Stream.operations
 
         public Car GetByID(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var car = new Car();
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {                 
+                    while (reader.PeekChar() != -1)
+                    {
+                        
+                        car.Id = reader.ReadInt32();
+                        car.Brand = reader.ReadString();
+                        car.Model = reader.ReadString();
+                        car.Number = reader.ReadInt32();
+                        car.OwnerId = reader.ReadInt32();
+                        if (car.Id == id)
+                        {                            
+                            break;
+                        }
+                    }
+                }
+
+                return car;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public void Insert(Car car)

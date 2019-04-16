@@ -11,7 +11,7 @@ namespace Stream_Bynary_Task4__
 
             Car c = new Car()
             {
-                Id = 4,
+                Id = 5,
                 Brand = "Tesla",
                 Model = "Model3",
                 Number = 122,
@@ -30,18 +30,26 @@ namespace Stream_Bynary_Task4__
                 Console.WriteLine(car.OwnerId);
                 Console.WriteLine();
             }
-            carCRD.Delete(4);
+            //carCRD.Delete(2);
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("new");
-            foreach (Car car in carCRD.GetAll())
-            {
-                Console.WriteLine(car.Id);
-                Console.WriteLine(car.Brand);
-                Console.WriteLine(car.Model);
-                Console.WriteLine(car.Number);
-                Console.WriteLine(car.OwnerId);
-                Console.WriteLine();
-            }
+            //foreach (Car car in carCRD.GetAll())
+            //{
+            //    Console.WriteLine(car.Id);
+            //    Console.WriteLine(car.Brand);
+            //    Console.WriteLine(car.Model);
+            //    Console.WriteLine(car.Number);
+            //    Console.WriteLine(car.OwnerId);
+            //    Console.WriteLine();
+            //}
+
+            Car t = carCRD.GetByID(3);
+            Console.WriteLine(t.Id);
+            Console.WriteLine(t.Brand);
+            Console.WriteLine(t.Model);
+            Console.WriteLine(t.Number);
+            Console.WriteLine(t.OwnerId);
+            Console.WriteLine();
 
             Console.ReadLine();
         }
