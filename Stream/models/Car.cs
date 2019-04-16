@@ -12,6 +12,12 @@ namespace Stream.models
         public string Model { get; set; }
         public int Number { get; set; }
 
+        public Car()
+        {
+            Brand = "";
+            Model = "";
+            Number = "";
+        }
         public Car(string b, string m, int n)
         {
             Brand = b;
