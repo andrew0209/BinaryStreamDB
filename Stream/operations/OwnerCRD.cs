@@ -2,13 +2,14 @@
 using Stream.models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Stream.operations
 {
     class OwnerCRD : ICRD<Owner>
     {
-        string path = "DataBase.dat";
-        public void Delete(long id)
+        public string path = Path.Combine(Environment.CurrentDirectory, "DataBase.dat");
+        public void Delete(int id)
         {
             throw new NotImplementedException();
         }
@@ -18,7 +19,7 @@ namespace Stream.operations
             throw new NotImplementedException();
         }
 
-        public Owner GetByID(long id)
+        public Owner GetByID(int id)
         {
             throw new NotImplementedException();
         }

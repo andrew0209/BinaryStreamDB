@@ -5,8 +5,8 @@ namespace Stream.interfaces
     interface ICRD<T> where T : class
     {
         List<T> GetAll();
-        T GetByID(long id);
+        T GetByID(int id);
         void Insert(T item);
-        void Delete(long id);
+        void Delete(int id);
     }
 }
