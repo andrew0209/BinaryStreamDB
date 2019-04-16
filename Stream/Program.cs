@@ -45,7 +45,8 @@ namespace Stream_Bynary_Task4__
             cars[0] = new Car("BMW", "X6", 122, 0);
             cars[1] = new Car("Audi", "A6", 123, 0);
 
-            string path = @"D:\Progi\C#\Stream\Stream\binar.bin";
+            string fileName = "DataBase.dat";
+            string path = Path.Combine(Environment.CurrentDirectory, fileName);
 
             try
             {
@@ -61,6 +62,8 @@ namespace Stream_Bynary_Task4__
                         writer.Write(c.Model);
                         //writer.Write("\n");
                         writer.Write(c.Number);
+
+                        writer.Write(c.OwnerId);
                        
                     }
                 }
@@ -74,9 +77,10 @@ namespace Stream_Bynary_Task4__
                         string brand = reader.ReadString();
                         string model = reader.ReadString();
                         int number = reader.ReadInt32();
+                        int id = reader.ReadInt32();
 
-                        Console.WriteLine("Brand: {0}  Model: {1}  Number: {2}",
-                            brand, model, number);
+                        Console.WriteLine("Brand: {0}  Model: {1}  Number: {2} ID: {3}",
+                            brand, model, number, id);
                     }
                 }
             }

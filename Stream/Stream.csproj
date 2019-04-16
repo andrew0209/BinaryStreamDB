@@ -54,6 +54,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="binar.bin" />
+    <None Include="DataBase.bin" />
     <None Include="DataBase.dat" />
   </ItemGroup>
   <ItemGroup>
