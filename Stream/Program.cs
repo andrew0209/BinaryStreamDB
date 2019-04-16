@@ -8,24 +8,39 @@ namespace Stream_Bynary_Task4__
     {
         static void Main(string[] args)
         {
-            Car[] cars = new Car[2];
-            cars[0] = new Car("BMW", "X6", 122, 0);
-            cars[1] = new Car("Audi", "A6", 123, 0);
 
             Car c = new Car()
             {
+                Id = 4,
                 Brand = "Tesla",
                 Model = "Model3",
                 Number = 122,
-                OwnerId = 0
+                OwnerId = 2
             };
 
             CarCRD carCRD = new CarCRD();
-            carCRD.Insert(c);
+            //carCRD.Insert(c);
+            Console.WriteLine("old");
             foreach (Car car in carCRD.GetAll())
             {
+                Console.WriteLine(car.Id);
+                Console.WriteLine(car.Brand);
                 Console.WriteLine(car.Model);
-
+                Console.WriteLine(car.Number);
+                Console.WriteLine(car.OwnerId);
+                Console.WriteLine();
+            }
+            carCRD.Delete(4);
+            Console.WriteLine("------------------------------------------------");
+            Console.WriteLine("new");
+            foreach (Car car in carCRD.GetAll())
+            {
+                Console.WriteLine(car.Id);
+                Console.WriteLine(car.Brand);
+                Console.WriteLine(car.Model);
+                Console.WriteLine(car.Number);
+                Console.WriteLine(car.OwnerId);
+                Console.WriteLine();
             }
 
             Console.ReadLine();
