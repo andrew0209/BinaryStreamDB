@@ -7,6 +7,7 @@ namespace Stream.operations
 {
     class OwnerCRD : ICRD<Owner>
     {
+        string path = "";
         public void Delete(long id)
         {
             throw new NotImplementedException();

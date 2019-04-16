@@ -42,8 +42,8 @@ namespace Stream_Bynary_Task4__
         static void Main(string[] args)
         {
             Car[] cars = new Car[2];
-            cars[0] = new Car("BMW", "X6", 122);
-            cars[1] = new Car("Audi", "A6", 123);
+            cars[0] = new Car("BMW", "X6", 122, 0);
+            cars[1] = new Car("Audi", "A6", 123, 0);
 
             string path = @"D:\Progi\C#\Stream\Stream\binar.bin";
 
