@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="interfaces\ICRD.cs" />
+    <Compile Include="models\Car.cs" />
+    <Compile Include="models\Owner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -52,6 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="str.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="operations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

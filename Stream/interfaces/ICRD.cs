@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Stream.interfaces
 {
-    interface ICRD
+    interface ICRD<T> where T : class
     {
+        List<T> GetAll();
+        T GetByID(long id);
+        void Insert(T item);
+        void Delete(long id);
     }
 }

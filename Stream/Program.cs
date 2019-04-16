@@ -4,23 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Stream.models;
 
 namespace Stream_Bynary_Task4__
 {
-    public class Car
-    {
-        public string Brand { get; set; }
-        public string Model { get; set; }
-        public int Number { get; set; }
-
-
-        public Car(string b, string m, int n)
-        {
-            Brand = b;
-            Model = m;
-            Number = n;
-        }
-    }
     public class BinaryCar
     {
         
