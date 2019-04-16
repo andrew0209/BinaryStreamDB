@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Stream.models
+﻿namespace Stream.models
 {
     public class Car
     {
@@ -16,7 +10,7 @@ namespace Stream.models
         {
             Brand = "";
             Model = "";
-            Number = "";
+            Number = 0;
         }
         public Car(string b, string m, int n)
         {
