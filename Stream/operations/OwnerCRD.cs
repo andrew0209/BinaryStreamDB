@@ -22,16 +22,16 @@ namespace Stream.operations
                     reader.Read();
                     while (reader.PeekChar() != -1)
                     {
-                        var car = new Owner();
-                        car.Id = reader.ReadInt32();
-                        car.Brand = reader.ReadString();
-                        car.Model = reader.ReadString();
-                        car.Number = reader.ReadInt32();
-                        car.OwnerId = reader.ReadInt32();
-                        if (car.Id != id)
-                        {
-                            Insert(car, newPath);
-                        }
+                        //var car = new Owner();
+                        //car.Id = reader.ReadInt32();
+                        //car.Brand = reader.ReadString();
+                        //car.Model = reader.ReadString();
+                        //car.Number = reader.ReadInt32();
+                        //car.OwnerId = reader.ReadInt32();
+                        //if (car.Id != id)
+                        //{
+                        //    Insert(car, newPath);
+                        //}
                     }
                 }
             }

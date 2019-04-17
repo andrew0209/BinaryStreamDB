@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="database\dbFormat.cs" />
     <Compile Include="interfaces\ICRD.cs" />
     <Compile Include="models\Car.cs" />
     <Compile Include="models\Owner.cs" />
