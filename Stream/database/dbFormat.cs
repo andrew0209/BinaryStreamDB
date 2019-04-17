@@ -153,9 +153,10 @@ namespace Stream.database
                     for (int i = 0; i < AmountOfTable; i++)
                     {
                         writer.Write(formats[i].Name); //name of table 
-                        writer.Write(formats[i].AmountOfItems + 1); //amount of items in table
+                        writer.Write(formats[i].AmountOfItems); //amount of items in table
                         if (formats[i].Name == tableName)
                         {
+                            formats[i].AmountOfItems++;
                             writer.Write(formats[i].Start); //table start from
                             shift = true;
                         }
@@ -260,6 +261,100 @@ namespace Stream.database
                 File.Delete(path);
                 File.Move("NewDataBaseFormat.dat", "DataBaseFormat.dat");
                 File.Delete(newPath);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public int GetStart(string TableName)
+        {
+            try
+            {
+                var formats = new List<dbFormat>();
+                int AmountOfTable = 0;
+                int StartT = 0;
+                //read data about tables
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    while (reader.PeekChar() != -1)
+                    {
+                        AmountOfTable = reader.ReadInt32();
+
+                        for (int i = 0; i < AmountOfTable; i++)
+                        {
+                            var format = new dbFormat();
+                            format.types = new List<string>();
+                            format.Name = reader.ReadString();
+                            
+                            format.AmountOfItems = reader.ReadInt32();
+                            format.Start = reader.ReadInt32();
+                            if (format.Name == TableName)
+                            {
+                                StartT = format.Start;
+                                return StartT;
+                            }
+                            format.AmountOfColumns = reader.ReadInt32();
+
+                            for (int k = 0; k < format.AmountOfColumns; k++)
+                            {
+                                format.types.Add(reader.ReadString()); // types of column. order is important
+                            }
+                            formats.Add(format);
+                        }
+                        break;
+                    }
+                }
+                return StartT;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public int GetEnd(string TableName)
+        {
+            try
+            {
+                var formats = new List<dbFormat>();
+                int AmountOfTable = 0;
+                int End = 0;
+                //read data about tables
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    while (reader.PeekChar() != -1)
+                    {
+                        AmountOfTable = reader.ReadInt32();
+
+                        for (int i = 0; i < AmountOfTable; i++)
+                        {
+                            var format = new dbFormat();
+                            format.types = new List<string>();
+                            format.Name = reader.ReadString();
+
+                            format.AmountOfItems = reader.ReadInt32();
+                            format.Start = reader.ReadInt32();
+                            if (format.Name == TableName)
+                            {
+                                End = format.Start + format.AmountOfItems;
+                                return End;
+                            }
+                            format.AmountOfColumns = reader.ReadInt32();
+
+                            for (int k = 0; k < format.AmountOfColumns; k++)
+                            {
+                                format.types.Add(reader.ReadString()); // types of column. order is important
+                            }
+                            formats.Add(format);
+                        }
+                        break;
+                    }
+                }
+                return End;
+
 
             }
             catch (Exception ex)

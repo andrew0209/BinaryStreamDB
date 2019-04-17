@@ -59,18 +59,26 @@ namespace Stream.operations
             try
             {
                 var cars = new List<Car>();
+                dbFormat format = new dbFormat();
+                int start = format.GetStart("cars");
+                int end = format.GetEnd("cars");
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {                    
                     //while (reader.BaseStream.Position != reader.BaseStream.Length)
                     while (reader.PeekChar() != -1)
                     {
-                        var car = new Car();
-                        car.Id = reader.ReadInt32();
-                        car.Brand = reader.ReadString();
-                        car.Model = reader.ReadString();
-                        car.Number = reader.ReadInt32();
-                        car.OwnerId = reader.ReadInt32();
-                        cars.Add(car);
+                        for(int i = start; i<=end; i++)
+                        {
+                            var car = new Car();
+                            car.Id = reader.ReadInt32();
+                            car.Brand = reader.ReadString();
+                            car.Model = reader.ReadString();
+                            car.Number = reader.ReadInt32();
+                            car.OwnerId = reader.ReadInt32();
+                            cars.Add(car);
+                            
+                        }
+                        break;
                     }
                 }
 
