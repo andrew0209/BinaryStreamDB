@@ -27,33 +27,34 @@ namespace Stream_Bynary_Task4__
             types.Add("string");
             types.Add("string");
             types.Add("int");
-            format.CreateTable("cars", 5, types);
+            //format.CreateTable("cars", 5, types);
+            //format.ChangeFormat("cars");
 
 
-            //CarCRD carCRD = new CarCRD();
-            //carCRD.Insert(c);
-            //Console.WriteLine("old");
-            //foreach (Car car in carCRD.GetAll())
-            //{
-            //    Console.WriteLine(car.Id);
-            //    Console.WriteLine(car.Brand);
-            //    Console.WriteLine(car.Model);
-            //    Console.WriteLine(car.Number);
-            //    Console.WriteLine(car.OwnerId);
-            //    Console.WriteLine();
-            //}
+            CarCRD carCRD = new CarCRD();
+            carCRD.Insert(c);
+            Console.WriteLine("old");
+            foreach (Car car in carCRD.GetAll())
+            {
+                Console.WriteLine(car.Id);
+                Console.WriteLine(car.Brand);
+                Console.WriteLine(car.Model);
+                Console.WriteLine(car.Number);
+                Console.WriteLine(car.OwnerId);
+                Console.WriteLine();
+            }
             //carCRD.Delete(2);
             Console.WriteLine("------------------------------------------------");
-            //Console.WriteLine("new");
-            //foreach (Car car in carCRD.GetAll())
-            //{
-            //    Console.WriteLine(car.Id);
-            //    Console.WriteLine(car.Brand);
-            //    Console.WriteLine(car.Model);
-            //    Console.WriteLine(car.Number);
-            //    Console.WriteLine(car.OwnerId);
-            //    Console.WriteLine();
-            //}
+            Console.WriteLine("new");
+            foreach (Car car in carCRD.GetAll())
+            {
+                Console.WriteLine(car.Id);
+                Console.WriteLine(car.Brand);
+                Console.WriteLine(car.Model);
+                Console.WriteLine(car.Number);
+                Console.WriteLine(car.OwnerId);
+                Console.WriteLine();
+            }
 
             //Car t = carCRD.GetByID(3);
             //Console.WriteLine(t.Id);

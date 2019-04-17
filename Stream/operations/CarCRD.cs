@@ -124,7 +124,8 @@ namespace Stream.operations
                     writer.Write(car.Number);
                     writer.Write(car.OwnerId);
                 }
-                //call function
+                dbFormat format = new dbFormat();
+                format.ChangeFormatA("cars");
             }
             catch (Exception ex)
             {
@@ -144,6 +145,8 @@ namespace Stream.operations
                     writer.Write(car.Number);
                     writer.Write(car.OwnerId);
                 }
+                dbFormat format = new dbFormat();
+                format.ChangeFormatM("cars");
             }
             catch (Exception ex)
             {
