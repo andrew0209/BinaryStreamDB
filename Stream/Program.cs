@@ -28,7 +28,6 @@ namespace Stream_Bynary_Task4__
             types.Add("string");
             types.Add("int");
             //format.CreateTable("cars", 5, types);
-            //format.ChangeFormat("cars");
 
 
             CarCRD carCRD = new CarCRD();

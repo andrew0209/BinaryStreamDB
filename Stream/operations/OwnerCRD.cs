@@ -1,4 +1,5 @@
-﻿using Stream.interfaces;
+﻿using Stream.database;
+using Stream.interfaces;
 using Stream.models;
 using System;
 using System.Collections.Generic;
@@ -22,16 +23,14 @@ namespace Stream.operations
                     reader.Read();
                     while (reader.PeekChar() != -1)
                     {
-                        //var car = new Owner();
-                        //car.Id = reader.ReadInt32();
-                        //car.Brand = reader.ReadString();
-                        //car.Model = reader.ReadString();
-                        //car.Number = reader.ReadInt32();
-                        //car.OwnerId = reader.ReadInt32();
-                        //if (car.Id != id)
-                        //{
-                        //    Insert(car, newPath);
-                        //}
+                        var owner = new Owner();
+                        owner.Id = reader.ReadInt32();
+                        owner.FirstName = reader.ReadString();
+                        owner.LastName = reader.ReadString();
+                        if (owner.Id != id)
+                        {
+                            Insert(owner, newPath);
+                        }
                     }
                 }
             }
@@ -56,17 +55,93 @@ namespace Stream.operations
 
         public List<Owner> GetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var owners = new List<Owner>();
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    //while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    while (reader.PeekChar() != -1)
+                    {
+                        var owner = new Owner();
+                        owner.Id = reader.ReadInt32();
+                        owner.FirstName = reader.ReadString();
+                        owner.LastName = reader.ReadString();
+                        owners.Add(owner);
+                    }
+                }
+
+                return owners;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Owner GetByID(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var owner = new Owner();
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    while (reader.PeekChar() != -1)
+                    {
+                        owner.Id = reader.ReadInt32();
+                        owner.FirstName = reader.ReadString();
+                        owner.LastName = reader.ReadString();
+                        if (owner.Id != id)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                return owner;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public void Insert(Owner item)
+        public void Insert(Owner owner)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
+                {
+                    writer.Write(owner.Id);
+                    writer.Write(owner.FirstName);
+                    writer.Write(owner.LastName);
+                }
+                dbFormat format = new dbFormat();
+                format.ChangeFormatA("owners");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void Insert(Owner owner, string path)
+        {
+            try
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
+                {
+                    writer.Write(owner.Id);
+                    writer.Write(owner.FirstName);
+                    writer.Write(owner.LastName);
+                }
+                dbFormat format = new dbFormat();
+                format.ChangeFormatM("owners");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
