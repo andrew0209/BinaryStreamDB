@@ -108,58 +108,79 @@ namespace Stream.database
                 throw new Exception(ex.Message);
             }
         }
-        public void ChangeFormat(string type)
+        public void ChangeFormat(string tableName)
         {
-            string newPath = Path.Combine(Environment.CurrentDirectory, "NewDataBase.dat");
             try
             {
-                FileStream fs = new FileStream("NewDataBase.dat", FileMode.CreateNew);
-                fs.Close();
-                fs.Dispose();
-
                 var formats = new List<dbFormat>();
                 int AmountOfTable = 0;
 
                 //read data about tables
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
-                    AmountOfTable = reader.ReadInt32();
-
-                    for (int i = 0; i < AmountOfTable; i++)
+                    while (reader.PeekChar() != -1)
                     {
-                        var format = new dbFormat();
-                        format.Name = reader.ReadString();
-                        format.AmountOfItems = reader.ReadInt32();
-                        format.Start = reader.ReadInt32();
-                        formats.Add(format);
+                        AmountOfTable = reader.ReadInt32();
+
+                        for (int i = 0; i < AmountOfTable; i++)
+                        {
+                            var format = new dbFormat();
+                            format.types = new List<string>();
+                            format.Name = reader.ReadString();
+                            format.AmountOfItems = reader.ReadInt32();
+                            format.Start = reader.ReadInt32();
+                            format.AmountOfColumns = reader.ReadInt32();
+                            for (int k = 0; k < format.AmountOfColumns; k++)
+                            {
+                                format.types.Add(reader.ReadString()); // types of column. order is important
+                            }
+                            formats.Add(format);
+                        }
+                        break;
                     }
                 }
 
-                using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(path)))
+                string newPath = Path.Combine(Environment.CurrentDirectory, "NewDataBaseFormat.dat");
+
+                FileStream fs = new FileStream("NewDataBaseFormat.dat", FileMode.CreateNew);
+                fs.Close();
+                fs.Dispose();
+
+                using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(newPath)))
                 {
-                    writer.Write(AmountOfTable);
+                    bool shift = false;
+                    writer.Write(AmountOfTable + 1); //amount of tables
                     for (int i = 0; i < AmountOfTable; i++)
                     {
-                        writer.Write(formats[i].Name);
-                        if (formats[i].Name == "f")
-                            writer.Write(formats[i].AmountOfItems + 1);
-                        writer.Write(formats[i].Start + 1);
+                        writer.Write(formats[i].Name); //name of table 
+                        writer.Write(formats[i].AmountOfItems + 1); //amount of items in table
+                        if (formats[i].Name == tableName)
+                        {
+                            writer.Write(formats[i].Start); //table start from
+                            shift = true;
+                        }
+                        else if (shift)
+                        {
+                            writer.Write(formats[i].Start + 1);//table start from
+                        }
+                        else
+                        {
+                            writer.Write(formats[i].Start); //table start from
+                        }
+                        writer.Write(formats[i].AmountOfColumns); //amount of columns
+                        for (int j = 0; j < formats[i].types.Count; j++)
+                        {
+                            writer.Write(formats[i].types[j]); // types of column. order is important
+                        }
                     }
-
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
 
-            try
-            {
-                File.Delete(Path.Combine(Environment.CurrentDirectory, "backup.dat"));
-                File.Move("DataBase.dat", "backup.dat");
+                File.Delete(Path.Combine(Environment.CurrentDirectory, "backupFormat.dat"));
+                File.Move("DataBaseFormat.dat", "backupFormat.dat");
                 File.Delete(path);
-                File.Move("NewDataBase.dat", "DataBase.dat");
+                File.Move("NewDataBaseFormat.dat", "DataBaseFormat.dat");
                 File.Delete(newPath);
+
             }
             catch (Exception ex)
             {
