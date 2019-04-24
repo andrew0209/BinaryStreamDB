@@ -63,10 +63,9 @@ namespace Stream.operations
                 int end = format.GetEnd("owners");
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
-                    //while (reader.BaseStream.Position != reader.BaseStream.Length)
                     while (reader.PeekChar() != -1)
                     {
-                        for(int i = 0; i<start; i++)
+                        for(int i = 1; i<start; i++)
                         {
                             var car = new Car();
                             car.Id = reader.ReadInt32();
@@ -74,9 +73,8 @@ namespace Stream.operations
                             car.Model = reader.ReadString();
                             car.Number = reader.ReadInt32();
                             car.OwnerId = reader.ReadInt32();
-                            //cars.Add(car);
                         }
-                        for (int i = start; i <= end; i++)
+                        for (int i = start; i < end; i++)
                         {
                             var owner = new Owner();
                             owner.Id = reader.ReadInt32();

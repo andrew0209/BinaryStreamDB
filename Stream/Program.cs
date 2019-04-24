@@ -41,8 +41,8 @@ namespace Stream_Bynary_Task4__
 
             CarCRD carCRD = new CarCRD();
             OwnerCRD own = new OwnerCRD();
-            //own.Insert(o);
-            //carCRD.Insert(c);
+            own.Insert(o);
+            carCRD.Insert(c);
             Console.WriteLine("old");
             foreach (Car car in carCRD.GetAll())
             {
@@ -53,7 +53,7 @@ namespace Stream_Bynary_Task4__
                 Console.WriteLine(car.OwnerId);
                 Console.WriteLine();
             }
-            //carCRD.Delete(2);
+            //carCRD.Delete(5);
             Console.WriteLine("------------------------------------------------");
             Console.WriteLine("new");
             foreach (Car car in carCRD.GetAll())
@@ -69,8 +69,7 @@ namespace Stream_Bynary_Task4__
             {
                 Console.WriteLine(car.Id);
                 Console.WriteLine(car.FirstName);
-                Console.WriteLine(car.LastName);
-                
+                Console.WriteLine(car.LastName);                
             }
             //dbFormat f = new dbFormat();
             //Console.WriteLine(f.GetStart("cars"));

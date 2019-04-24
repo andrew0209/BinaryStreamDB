@@ -153,19 +153,21 @@ namespace Stream.database
                     for (int i = 0; i < AmountOfTable; i++)
                     {
                         writer.Write(formats[i].Name); //name of table 
-                        writer.Write(formats[i].AmountOfItems); //amount of items in table
+                        //writer.Write(formats[i].AmountOfItems); //amount of items in table
                         if (formats[i].Name == tableName)
                         {
-                            formats[i].AmountOfItems++;
+                            writer.Write(formats[i].AmountOfItems + 1);
                             writer.Write(formats[i].Start); //table start from
                             shift = true;
                         }
                         else if (shift)
                         {
+                            writer.Write(formats[i].AmountOfItems);
                             writer.Write(formats[i].Start + 1);//table start from
                         }
                         else
                         {
+                            writer.Write(formats[i].AmountOfItems);
                             writer.Write(formats[i].Start); //table start from
                         }
                         writer.Write(formats[i].AmountOfColumns); //amount of columns

@@ -67,7 +67,7 @@ namespace Stream.operations
                     //while (reader.BaseStream.Position != reader.BaseStream.Length)
                     while (reader.PeekChar() != -1)
                     {
-                        for(int i = start; i<=end; i++)
+                        for(int i = start; i<end; i++)
                         {
                             var car = new Car();
                             car.Id = reader.ReadInt32();
@@ -75,8 +75,7 @@ namespace Stream.operations
                             car.Model = reader.ReadString();
                             car.Number = reader.ReadInt32();
                             car.OwnerId = reader.ReadInt32();
-                            cars.Add(car);
-                            
+                            cars.Add(car);                        
                         }
                         break;
                     }
