@@ -42,7 +42,7 @@ namespace Stream_Bynary_Task4__
             CarCRD carCRD = new CarCRD();
             OwnerCRD own = new OwnerCRD();
             //own.Insert(o);
-            carCRD.Insert(c);
+            //carCRD.Insert(c);
             Console.WriteLine("old");
             foreach (Car car in carCRD.GetAll())
             {
@@ -81,7 +81,7 @@ namespace Stream_Bynary_Task4__
             //Console.WriteLine(t.Model);
             //Console.WriteLine(t.Number);
             //Console.WriteLine(t.OwnerId);
-            //Console.WriteLine();
+            Console.WriteLine();
 
             Console.ReadLine();
         }
