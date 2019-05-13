@@ -1,5 +1,4 @@
-﻿using Stream.database;
-using Stream.interfaces;
+﻿using Stream.interfaces;
 using Stream.models;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,13 @@ namespace Stream.operations
 {
     class OwnerCRD : ICRD<Owner>
     {
+        private string TableName { get; set; }
+
+        public OwnerCRD(string name)
+        {
+            TableName = name;
+        }
+
         public string path = Path.Combine(Environment.CurrentDirectory, "DataBase.dat");
         public void Delete(int id)
         {
@@ -18,18 +24,83 @@ namespace Stream.operations
                 FileStream fs = new FileStream("NewDataBase.dat", FileMode.CreateNew);
                 fs.Close();
                 fs.Dispose();
+
+                bool writeToOwner = false;
+                int current = 0;
+                var owner = new Owner();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
-                    reader.Read();
                     while (reader.PeekChar() != -1)
                     {
-                        var owner = new Owner();
-                        owner.Id = reader.ReadInt32();
-                        owner.FirstName = reader.ReadString();
-                        owner.LastName = reader.ReadString();
-                        if (owner.Id != id)
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
                         {
-                            Insert(owner, newPath);
+                            case 'C': // char
+                                Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 1:
+                                            owner.FirstName = reader.ReadString();
+                                            current++;
+                                            break;
+                                        case 2:
+                                            owner.LastName = reader.ReadString();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                if (reader.ReadString() == TableName)
+                                {
+                                    writeToOwner = true;
+                                }
+                                else
+                                {
+                                    writeToOwner = false;
+                                }
+                                break;
+                            case 'I': // int32
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 0:
+                                            owner.Id = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadInt32();
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (reader.ReadString() == "%end%")
+                                {
+                                    if (owner.Id != id)
+                                    {
+                                        Insert(owner, newPath);
+                                        owner = new Owner();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("Unexpected error");
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
                         }
                     }
                 }
@@ -58,31 +129,83 @@ namespace Stream.operations
             try
             {
                 var owners = new List<Owner>();
-                dbFormat format = new dbFormat();
-                int start = format.GetStart("owners");
-                int end = format.GetEnd("owners");
+                bool writeToOwner = false;
+                int current = 0;
+                var owner = new Owner();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
                     while (reader.PeekChar() != -1)
                     {
-                        for(int i = 1; i<start; i++)
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
                         {
-                            var car = new Car();
-                            car.Id = reader.ReadInt32();
-                            car.Brand = reader.ReadString();
-                            car.Model = reader.ReadString();
-                            car.Number = reader.ReadInt32();
-                            car.OwnerId = reader.ReadInt32();
+                            case 'C': // char
+                                Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 1:
+                                            owner.FirstName = reader.ReadString();
+                                            current++;
+                                            break;
+                                        case 2:
+                                            owner.LastName = reader.ReadString();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                if (reader.ReadString().Equals(TableName))
+                                {
+                                    writeToOwner = true;
+                                }
+                                else
+                                {
+                                    writeToOwner = false;
+                                }
+                                break;
+                            case 'I': // int32
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 0:
+                                            owner.Id = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadInt32();
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (reader.ReadString() == "%end%")
+                                {
+                                    if (writeToOwner)
+                                    {
+                                        owners.Add(owner);
+                                        owner = new Owner();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("Unexpected error");
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
                         }
-                        for (int i = start; i < end; i++)
-                        {
-                            var owner = new Owner();
-                            owner.Id = reader.ReadInt32();
-                            owner.FirstName = reader.ReadString();
-                            owner.LastName = reader.ReadString();
-                            owners.Add(owner);
-                        }
-                        break;
                     }
                 }
 
@@ -99,21 +222,85 @@ namespace Stream.operations
             try
             {
                 var owner = new Owner();
+                bool writeToOwner = false;
+                int current = 0;
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
                     while (reader.PeekChar() != -1)
                     {
-                        owner.Id = reader.ReadInt32();
-                        owner.FirstName = reader.ReadString();
-                        owner.LastName = reader.ReadString();
-                        if (owner.Id != id)
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
                         {
-                            break;
+                            case 'C': // char
+                                Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 1:
+                                            owner.FirstName = reader.ReadString();
+                                            current++;
+                                            break;
+                                        case 2:
+                                            owner.LastName = reader.ReadString();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                if (reader.ReadString() == TableName)
+                                {
+                                    writeToOwner = true;
+                                }
+                                else
+                                {
+                                    writeToOwner = false;
+                                }
+                                break;
+                            case 'I': // int32
+                                if (writeToOwner)
+                                {
+                                    switch (current)
+                                    {
+                                        case 0:
+                                            owner.Id = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadInt32();
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (reader.ReadString() == "%end%")
+                                {
+                                    if (owner.Id == id)
+                                    {
+                                        return owner;
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("Unexpected error");
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
                         }
                     }
                 }
 
-                return owner;
+                return new Owner(); //todo need return message not found
             }
             catch (Exception ex)
             {
@@ -127,12 +314,17 @@ namespace Stream.operations
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
                 {
+                    writer.Write('T');
+                    writer.Write(TableName);
+                    writer.Write('I');
                     writer.Write(owner.Id);
+                    writer.Write('S');
                     writer.Write(owner.FirstName);
+                    writer.Write('S');
                     writer.Write(owner.LastName);
+                    writer.Write('E');
+                    writer.Write("%end%");
                 }
-                dbFormat format = new dbFormat();
-                format.ChangeFormatA("owners");
             }
             catch (Exception ex)
             {
@@ -146,12 +338,17 @@ namespace Stream.operations
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
                 {
+                    writer.Write('T');
+                    writer.Write(TableName);
+                    writer.Write('I');
                     writer.Write(owner.Id);
+                    writer.Write('S');
                     writer.Write(owner.FirstName);
+                    writer.Write('S');
                     writer.Write(owner.LastName);
+                    writer.Write('E');
+                    writer.Write("%end%");
                 }
-                dbFormat format = new dbFormat();
-                format.ChangeFormatM("owners");
             }
             catch (Exception ex)
             {

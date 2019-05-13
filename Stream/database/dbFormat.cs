@@ -14,42 +14,54 @@ namespace Stream.database
 
         public string path = Path.Combine(Environment.CurrentDirectory, "DataBaseFormat.dat");
 
+        private bool FileIsEmpty(string name)
+        {
+            if (new FileInfo(name).Length == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void CreateTable(string name, int colums, List<string> param)
         {
             try
             {
                 var formats = new List<dbFormat>();
                 int AmountOfTable = 0;
-                bool empty = true;
 
-                //read data about tables
-                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
-                {
-                    while (reader.PeekChar() != -1)
+                if (!FileIsEmpty(path))
+                {                  
+                    //read data about tables
+                    using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                     {
-                        AmountOfTable = reader.ReadInt32();
-
-                        for (int i = 0; i < AmountOfTable; i++)
+                        while (reader.PeekChar() != -1)
                         {
-                            var format = new dbFormat();
-                            format.types = new List<string>();
-                            format.Name = reader.ReadString();
-                            format.AmountOfItems = reader.ReadInt32();
-                            format.Start = reader.ReadInt32();
-                            format.AmountOfColumns = reader.ReadInt32();
-                            for (int k = 0; k < format.AmountOfColumns; k++)
-                            {
-                                format.types.Add(reader.ReadString()); // types of column. order is important
-                            }
-                            formats.Add(format);
-                        }
+                            AmountOfTable = reader.ReadInt32();
 
-                        empty = false;
-                        break;
+                            for (int i = 0; i < AmountOfTable; i++)
+                            {
+                                var format = new dbFormat();
+                                format.types = new List<string>();
+                                format.Name = reader.ReadString();
+                                format.AmountOfItems = reader.ReadInt32();
+                                format.Start = reader.ReadInt32();
+                                format.AmountOfColumns = reader.ReadInt32();
+                                for (int k = 0; k < format.AmountOfColumns; k++)
+                                {
+                                    format.types.Add(reader.ReadString()); // types of column. order is important
+                                }
+                                formats.Add(format);
+                            }
+                            break; //check if needed
+                        }
                     }
                 }
 
-                if (empty)
+                if (FileIsEmpty(path))
                 {
                     using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(path)))
                     {
@@ -72,9 +84,10 @@ namespace Stream.database
                     fs.Close();
                     fs.Dispose();
 
-                    using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(newPath)))
+                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
                     {
                         writer.Write(AmountOfTable + 1); //amount of tables
+
                         for (int i = 0; i < AmountOfTable; i++)
                         {
                             writer.Write(formats[i].Name); //name of table 
@@ -86,6 +99,8 @@ namespace Stream.database
                                 writer.Write(formats[i].types[j]); // types of column. order is important
                             }
                         }
+
+                        //new table
                         writer.Write(name); //name of table 
                         writer.Write(0); //amount of items in table
                         writer.Write(formats[AmountOfTable - 1].Start + formats[AmountOfTable - 1].AmountOfItems + 1); //table start from

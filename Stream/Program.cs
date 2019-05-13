@@ -1,9 +1,6 @@
 ﻿using Stream.models;
 using Stream.operations;
-using Stream.database;
 using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace Stream_Bynary_Task4__
 {
@@ -11,39 +8,31 @@ namespace Stream_Bynary_Task4__
     {
         static void Main(string[] args)
         {
-            
+
             Car c = new Car()
             {
                 Id = 5,
-                Brand = "Tesla",
-                Model = "Model3",
+                Brand = "BMW",
+                Model = "X3",
                 Number = 122,
                 OwnerId = 2
             };
             Owner o = new Owner()
             {
                 Id = 5,
-                FirstName = "aslkjd",
-                LastName = "asl;kd",
-               
+                FirstName = "Sem",
+                LastName = "Smith",
+
             };
 
-            dbFormat format = new dbFormat();
+            // todo console menu
+            // function which you can use Insert(object), Delete(id), GetAll(), GetById(id)
 
-            List<string> types = new List<string>();
-            types.Add("int");
-            types.Add("string");
-            types.Add("string");
-            types.Add("string");
-            types.Add("int");
-            //format.CreateTable("cars", 5, types);
-            //format.CreateTable("owners", 3, types);
+            CarCRD carCRD = new CarCRD("cars");
+            OwnerCRD own = new OwnerCRD("owners");
 
-            CarCRD carCRD = new CarCRD();
-            OwnerCRD own = new OwnerCRD();
-            own.Insert(o);
-            carCRD.Insert(c);
-            Console.WriteLine("old");
+            //carCRD.Insert(c);
+            carCRD.Delete(5);
             foreach (Car car in carCRD.GetAll())
             {
                 Console.WriteLine(car.Id);
@@ -53,34 +42,16 @@ namespace Stream_Bynary_Task4__
                 Console.WriteLine(car.OwnerId);
                 Console.WriteLine();
             }
-            //carCRD.Delete(5);
-            Console.WriteLine("------------------------------------------------");
-            Console.WriteLine("new");
-            foreach (Car car in carCRD.GetAll())
-            {
-                Console.WriteLine(car.Id);
-                Console.WriteLine(car.Brand);
-                Console.WriteLine(car.Model);
-                Console.WriteLine(car.Number);
-                Console.WriteLine(car.OwnerId);
-                Console.WriteLine();
-            }
+
+            //own.Insert(o);
+
             foreach (Owner car in own.GetAll())
             {
                 Console.WriteLine(car.Id);
                 Console.WriteLine(car.FirstName);
-                Console.WriteLine(car.LastName);                
+                Console.WriteLine(car.LastName);
+                Console.WriteLine();
             }
-            //dbFormat f = new dbFormat();
-            //Console.WriteLine(f.GetStart("cars"));
-            //Console.WriteLine(f.GetEnd("cars"));
-            //Car t = carCRD.GetByID(3);
-            //Console.WriteLine(t.Id);
-            //Console.WriteLine(t.Brand);
-            //Console.WriteLine(t.Model);
-            //Console.WriteLine(t.Number);
-            //Console.WriteLine(t.OwnerId);
-            Console.WriteLine();
 
             Console.ReadLine();
         }
