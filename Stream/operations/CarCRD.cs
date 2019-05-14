@@ -1,15 +1,24 @@
 ﻿using Stream.interfaces;
 using Stream.models;
-using Stream.database;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Stream.operations
 {
     class CarCRD : ICRD<Car>
     {
+        private string TableName { get; set; }
+
+        public CarCRD(string name)
+        {
+            TableName = name;
+        }
+
         public string path = Path.Combine(Environment.CurrentDirectory, "DataBase.dat");
+
         public void Delete(int id)
         {
             string newPath = Path.Combine(Environment.CurrentDirectory, "NewDataBase.dat");
@@ -18,19 +27,95 @@ namespace Stream.operations
                 FileStream fs = new FileStream("NewDataBase.dat", FileMode.CreateNew);
                 fs.Close();
                 fs.Dispose();
+
+                string tableN = string.Empty;
+                int ID = 0;
+                bool write = false;
+                int current = 0;
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
                     while (reader.PeekChar() != -1)
                     {
-                        var car = new Car();
-                        car.Id = reader.ReadInt32();
-                        car.Brand = reader.ReadString();
-                        car.Model = reader.ReadString();
-                        car.Number = reader.ReadInt32();
-                        car.OwnerId = reader.ReadInt32();
-                        if (car.Id != id)
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
                         {
-                            Insert(car, newPath);
+                            case 'C': // char
+                                //Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (write)
+                                {
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                    {
+                                        writer.Write('S');
+                                        writer.Write(reader.ReadString());
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                tableN = reader.ReadString();                                
+                                break;
+                            case 'I': // int32
+                                if (current == 0)
+                                {
+                                    ID = reader.ReadInt32();
+                                    if (ID == id)
+                                    {
+                                        write = false;
+                                        tableN = string.Empty;
+                                    }
+                                    else
+                                    {
+                                        write = true;
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('T');
+                                            writer.Write(tableN);
+                                            writer.Write('I');
+                                            writer.Write(ID);
+                                            tableN = string.Empty;
+                                            current++;
+                                        }
+                                    }
+                                    ID = 0;
+                                }
+                                else
+                                {
+                                    if (write)
+                                    {
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('I');
+                                            writer.Write(reader.ReadInt32());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        reader.ReadInt32();
+                                    }
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (write)
+                                {
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                    {
+                                        writer.Write('E');
+                                        writer.Write(reader.ReadString());
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
                         }
                     }
                 }
@@ -54,23 +139,111 @@ namespace Stream.operations
             }
         }
 
+        private void writeLine(string line, string path)
+        {
+            try
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
+                {
+                    writer.Write(line);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public List<Car> GetAll()
         {
             try
             {
+                bool writeToCar = false;
+                int current = 0;
                 var cars = new List<Car>();
+                var car = new Car();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
-                {                    
+                {
                     //while (reader.BaseStream.Position != reader.BaseStream.Length)
                     while (reader.PeekChar() != -1)
                     {
-                        var car = new Car();
-                        car.Id = reader.ReadInt32();
-                        car.Brand = reader.ReadString();
-                        car.Model = reader.ReadString();
-                        car.Number = reader.ReadInt32();
-                        car.OwnerId = reader.ReadInt32();
-                        cars.Add(car);
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
+                        {
+                            case 'C': // char
+                                Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (writeToCar)
+                                {
+                                    switch (current)
+                                    {
+                                        case 1:
+                                            car.Brand = reader.ReadString();
+                                            current++;
+                                            break;
+                                        case 2:
+                                            car.Model = reader.ReadString();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                if (reader.ReadString() == TableName)
+                                {
+                                    writeToCar = true;
+                                }
+                                else
+                                {
+                                    writeToCar = false;
+                                }
+                                break;
+                            case 'I': // int32
+                                if (writeToCar)
+                                {
+                                    switch (current)
+                                    {
+                                        case 0:
+                                            car.Id = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                        case 3:
+                                            car.Number = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                        case 4:
+                                            car.OwnerId = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadInt32();
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (reader.ReadString() == "%end%")
+                                {
+                                    if (writeToCar)
+                                    {
+                                        cars.Add(car);
+                                        car = new Car();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("Unexpected error");
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
+                        }
                     }
                 }
 
@@ -86,25 +259,95 @@ namespace Stream.operations
         {
             try
             {
+                bool writeToCar = false;
+                int current = 0;
                 var car = new Car();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
-                {                 
+                {
                     while (reader.PeekChar() != -1)
                     {
-                        
-                        car.Id = reader.ReadInt32();
-                        car.Brand = reader.ReadString();
-                        car.Model = reader.ReadString();
-                        car.Number = reader.ReadInt32();
-                        car.OwnerId = reader.ReadInt32();
-                        if (car.Id == id)
-                        {                            
-                            break;
+                        char fieldType = reader.ReadChar();
+                        switch (fieldType)
+                        {
+                            case 'C': // char
+                                Console.WriteLine(reader.ReadChar());
+                                break;
+                            case 'S': // string
+                                if (writeToCar)
+                                {
+                                    switch (current)
+                                    {
+                                        case 1:
+                                            car.Brand = reader.ReadString();
+                                            current++;
+                                            break;
+                                        case 2:
+                                            car.Model = reader.ReadString();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadString();
+                                }
+                                break;
+                            case 'T': // string name of table
+                                if (reader.ReadString() == TableName)
+                                {
+                                    writeToCar = true;
+                                }
+                                else
+                                {
+                                    writeToCar = false;
+                                }
+                                break;
+                            case 'I': // int32
+                                if (writeToCar)
+                                {
+                                    switch (current)
+                                    {
+                                        case 0:
+                                            car.Id = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                        case 3:
+                                            car.Number = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                        case 4:
+                                            car.OwnerId = reader.ReadInt32();
+                                            current++;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadInt32();
+                                }
+                                break;
+                            case 'E': // string end of table
+                                if (reader.ReadString() == "%end%")
+                                {
+                                    if (car.Id == id)
+                                    {
+                                        return car;
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("Unexpected error");
+                                }
+                                current = 0;
+                                break;
+                            default: // unexpected!
+                                throw new Exception("Unexpected field type");
                         }
                     }
                 }
 
-                return car;
+
+                return new Car(); //todo need return message not found
             }
             catch (Exception ex)
             {
@@ -118,14 +361,21 @@ namespace Stream.operations
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
                 {
+                    writer.Write('T');
+                    writer.Write(TableName);
+                    writer.Write('I');
                     writer.Write(car.Id);
+                    writer.Write('S');
                     writer.Write(car.Brand);
+                    writer.Write('S');
                     writer.Write(car.Model);
+                    writer.Write('I');
                     writer.Write(car.Number);
+                    writer.Write('I');
                     writer.Write(car.OwnerId);
+                    writer.Write('E');
+                    writer.Write("%end%");
                 }
-                dbFormat format = new dbFormat();
-                format.ChangeFormatA("cars");
             }
             catch (Exception ex)
             {
@@ -133,27 +383,33 @@ namespace Stream.operations
             }
         }
 
+        //use for deleting item
         public void Insert(Car car, string path)
         {
             try
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
                 {
+                    writer.Write('T');
+                    writer.Write(TableName);
+                    writer.Write('I');
                     writer.Write(car.Id);
+                    writer.Write('S');
                     writer.Write(car.Brand);
+                    writer.Write('S');
                     writer.Write(car.Model);
+                    writer.Write('I');
                     writer.Write(car.Number);
+                    writer.Write('I');
                     writer.Write(car.OwnerId);
+                    writer.Write('E');
+                    writer.Write("%end%");
                 }
-                dbFormat format = new dbFormat();
-                format.ChangeFormatM("cars");
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-
-        
     }
 }
