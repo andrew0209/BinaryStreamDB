@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Stream.models
 {
@@ -30,6 +31,15 @@ namespace Stream.models
             FirstName = fn;
             LastName = ln;
             Cars = new List<Car>(cars);
+        }
+        public void ConsoleRead()
+        {
+            Console.Write("Id: ");
+            Id = Convert.ToInt32(Console.ReadLine());
+            Console.Write("FirstName: ");
+            FirstName = Console.ReadLine();
+            Console.Write("LastName: ");
+            LastName = Console.ReadLine();
         }
     }
 }

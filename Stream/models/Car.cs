@@ -1,4 +1,6 @@
-﻿namespace Stream.models
+﻿using System;
+
+namespace Stream.models
 {
     public class Car
     {
@@ -23,6 +25,19 @@
             Model = m;
             Number = n;
             OwnerId = Oid;
+        }
+        public void ConsoleRead()
+        {
+            Console.Write("Id: ");
+            Id = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Brand: ");
+            Brand = Console.ReadLine();
+            Console.Write("Model: ");
+            Model = Console.ReadLine();
+            Console.Write("Number: ");
+            Number = Convert.ToInt32(Console.ReadLine());
+            Console.Write("OwnerId: ");
+            OwnerId = Convert.ToInt32(Console.ReadLine());
         }
     }
 }
