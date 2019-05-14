@@ -28,9 +28,10 @@ namespace Stream.operations
                 fs.Close();
                 fs.Dispose();
 
-                bool writeToCar = false;
+                string tableN = string.Empty;
+                int ID = 0;
+                bool write = false;
                 int current = 0;
-                var car = new Car();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
                     while (reader.PeekChar() != -1)
@@ -39,21 +40,15 @@ namespace Stream.operations
                         switch (fieldType)
                         {
                             case 'C': // char
-                                Console.WriteLine(reader.ReadChar());
+                                //Console.WriteLine(reader.ReadChar());
                                 break;
                             case 'S': // string
-                                if (writeToCar)
+                                if (write)
                                 {
-                                    switch (current)
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
                                     {
-                                        case 1:
-                                            car.Brand = reader.ReadString();
-                                            current++;
-                                            break;
-                                        case 2:
-                                            car.Model = reader.ReadString();
-                                            current++;
-                                            break;
+                                        writer.Write('S');
+                                        writer.Write(reader.ReadString());
                                     }
                                 }
                                 else
@@ -62,51 +57,60 @@ namespace Stream.operations
                                 }
                                 break;
                             case 'T': // string name of table
-                                if (reader.ReadString() == TableName)
-                                {
-                                    writeToCar = true;
-                                }
-                                else
-                                {
-                                    writeToCar = false;
-                                }
+                                tableN = reader.ReadString();                                
                                 break;
                             case 'I': // int32
-                                if (writeToCar)
+                                if (current == 0)
                                 {
-                                    switch (current)
+                                    ID = reader.ReadInt32();
+                                    if (ID == id)
                                     {
-                                        case 0:
-                                            car.Id = reader.ReadInt32();
-                                            current++;
-                                            break;
-                                        case 3:
-                                            car.Number = reader.ReadInt32();
-                                            current++;
-                                            break;
-                                        case 4:
-                                            car.OwnerId = reader.ReadInt32();
-                                            current++;
-                                            break;
+                                        write = false;
+                                        tableN = string.Empty;
                                     }
+                                    else
+                                    {
+                                        write = true;
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('T');
+                                            writer.Write(tableN);
+                                            writer.Write('I');
+                                            writer.Write(ID);
+                                            tableN = string.Empty;
+                                            current++;
+                                        }
+                                    }
+                                    ID = 0;
                                 }
                                 else
                                 {
-                                    reader.ReadInt32();
+                                    if (write)
+                                    {
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('I');
+                                            writer.Write(reader.ReadInt32());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        reader.ReadInt32();
+                                    }
                                 }
                                 break;
                             case 'E': // string end of table
-                                if (reader.ReadString() == "%end%")
+                                if (write)
                                 {
-                                    if (car.Id != id)
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
                                     {
-                                        Insert(car, newPath);
-                                        car = new Car();
+                                        writer.Write('E');
+                                        writer.Write(reader.ReadString());
                                     }
                                 }
                                 else
                                 {
-                                    throw new Exception("Unexpected error");
+                                    reader.ReadString();
                                 }
                                 current = 0;
                                 break;
@@ -135,6 +139,20 @@ namespace Stream.operations
             }
         }
 
+        private void writeLine(string line, string path)
+        {
+            try
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Append)))
+                {
+                    writer.Write(line);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public List<Car> GetAll()
         {
             try

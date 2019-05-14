@@ -11,15 +11,15 @@ namespace Stream_Bynary_Task4__
 
             Car c = new Car()
             {
-                Id = 5,
-                Brand = "BMW",
-                Model = "X3",
+                Id = 6,
+                Brand = "Tesla",
+                Model = "Model3",
                 Number = 122,
                 OwnerId = 2
             };
             Owner o = new Owner()
             {
-                Id = 5,
+                Id = 8,
                 FirstName = "Sem",
                 LastName = "Smith",
 
@@ -32,7 +32,7 @@ namespace Stream_Bynary_Task4__
             OwnerCRD own = new OwnerCRD("owners");
 
             //carCRD.Insert(c);
-            carCRD.Delete(5);
+            //carCRD.Delete(6);
             foreach (Car car in carCRD.GetAll())
             {
                 Console.WriteLine(car.Id);
@@ -44,6 +44,7 @@ namespace Stream_Bynary_Task4__
             }
 
             //own.Insert(o);
+            //own.Delete(8);
 
             foreach (Owner car in own.GetAll())
             {

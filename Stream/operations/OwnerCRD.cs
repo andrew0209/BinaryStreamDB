@@ -25,9 +25,10 @@ namespace Stream.operations
                 fs.Close();
                 fs.Dispose();
 
-                bool writeToOwner = false;
+                string tableN = string.Empty;
+                int ID = 0;
+                bool write = false;
                 int current = 0;
-                var owner = new Owner();
                 using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
                     while (reader.PeekChar() != -1)
@@ -36,21 +37,15 @@ namespace Stream.operations
                         switch (fieldType)
                         {
                             case 'C': // char
-                                Console.WriteLine(reader.ReadChar());
+                                //Console.WriteLine(reader.ReadChar());
                                 break;
                             case 'S': // string
-                                if (writeToOwner)
+                                if (write)
                                 {
-                                    switch (current)
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
                                     {
-                                        case 1:
-                                            owner.FirstName = reader.ReadString();
-                                            current++;
-                                            break;
-                                        case 2:
-                                            owner.LastName = reader.ReadString();
-                                            current++;
-                                            break;
+                                        writer.Write('S');
+                                        writer.Write(reader.ReadString());
                                     }
                                 }
                                 else
@@ -59,43 +54,60 @@ namespace Stream.operations
                                 }
                                 break;
                             case 'T': // string name of table
-                                if (reader.ReadString() == TableName)
-                                {
-                                    writeToOwner = true;
-                                }
-                                else
-                                {
-                                    writeToOwner = false;
-                                }
+                                tableN = reader.ReadString();
                                 break;
                             case 'I': // int32
-                                if (writeToOwner)
+                                if (current == 0)
                                 {
-                                    switch (current)
+                                    ID = reader.ReadInt32();
+                                    if (ID == id)
                                     {
-                                        case 0:
-                                            owner.Id = reader.ReadInt32();
-                                            current++;
-                                            break;
+                                        write = false;
+                                        tableN = string.Empty;
                                     }
+                                    else
+                                    {
+                                        write = true;
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('T');
+                                            writer.Write(tableN);
+                                            writer.Write('I');
+                                            writer.Write(ID);
+                                            tableN = string.Empty;
+                                            current++;
+                                        }
+                                    }
+                                    ID = 0;
                                 }
                                 else
                                 {
-                                    reader.ReadInt32();
+                                    if (write)
+                                    {
+                                        using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
+                                        {
+                                            writer.Write('I');
+                                            writer.Write(reader.ReadInt32());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        reader.ReadInt32();
+                                    }
                                 }
                                 break;
                             case 'E': // string end of table
-                                if (reader.ReadString() == "%end%")
+                                if (write)
                                 {
-                                    if (owner.Id != id)
+                                    using (BinaryWriter writer = new BinaryWriter(File.Open(newPath, FileMode.Append)))
                                     {
-                                        Insert(owner, newPath);
-                                        owner = new Owner();
+                                        writer.Write('E');
+                                        writer.Write(reader.ReadString());
                                     }
                                 }
                                 else
                                 {
-                                    throw new Exception("Unexpected error");
+                                    reader.ReadString();
                                 }
                                 current = 0;
                                 break;
@@ -103,6 +115,7 @@ namespace Stream.operations
                                 throw new Exception("Unexpected field type");
                         }
                     }
+
                 }
             }
             catch (Exception ex)
